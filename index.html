@@ -3,217 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Christmas Gift</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Noto+Serif+KR:wght@300;700&display=swap" rel="stylesheet">
+    <title>Merry Christmas! 🎁</title>
     <style>
-        :root {
-            --gold: #d4af37;
-            --deep-red: #4a0404;
-            --wine: #800020;
-        }
-
         body {
             margin: 0;
-            background: radial-gradient(circle at center, var(--wine), #000);
-            height: 100vh;
+            background: #0a0f1d;
+            color: white;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100vh;
             overflow: hidden;
-            font-family: 'Noto Serif KR', serif;
-            color: white;
         }
 
-        /* 고급스러운 눈 효과 */
-        .snow {
+        /* 눈 내리는 효과 */
+        .snowflake {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: -10px;
+            color: white;
             pointer-events: none;
-            z-index: 1;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh); }
         }
 
-        /* 선물 상자 컨테이너 */
-        .stage {
-            text-align: center;
-            z-index: 10;
-            transition: all 1s ease;
-        }
+        .container { text-align: center; z-index: 10; }
 
-        .title {
-            font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            color: var(--gold);
-            margin-bottom: 50px;
-            letter-spacing: 5px;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-        }
-
-        /* 선물 상자 디자인 */
-        .gift-wrapper {
-            position: relative;
+        /* 선물 상자 스타일 및 애니메이션 */
+        #gift-box {
+            font-size: 100px;
             cursor: pointer;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto;
+            transition: transform 0.2s;
+            display: inline-block;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
         }
 
-        .gift-emoji {
-            font-size: 120px;
-            filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6));
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        #gift-box:hover { transform: scale(1.1); }
 
-        .gift-wrapper:hover .gift-emoji {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        /* 팽창 및 폭발 애니메이션 */
+        /* 팽창하며 터지는 효과 */
         .explode {
-            animation: expandAndFade 0.8s forwards;
+            animation: explodeAnim 0.7s ease-out forwards;
         }
 
-        @keyframes expandAndFade {
+        @keyframes explodeAnim {
             0% { transform: scale(1); filter: brightness(1); }
-            40% { transform: scale(4); filter: brightness(3); opacity: 0.7; }
-            100% { transform: scale(10); opacity: 0; visibility: hidden; }
+            50% { transform: scale(3); filter: brightness(2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
         }
 
-        /* QR 결과 카드 (Glassmorphism) */
-        #result-card {
+        /* 결과 화면 (처음엔 숨김) */
+        #result {
             display: none;
             opacity: 0;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            transform: translateY(50px);
-            transition: all 1s ease;
+            transform: scale(0.5);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #result-card.show {
+        #result.show {
             display: block;
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
         }
 
-        .qr-frame {
+        .qr-box {
             background: white;
-            padding: 15px;
-            border-radius: 15px;
+            padding: 20px;
+            border-radius: 20px;
             display: inline-block;
-            margin: 20px 0;
-            box-shadow: 0 0 20px var(--gold);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
         }
 
-        .btn-link {
-            display: block;
-            margin-top: 20px;
-            color: var(--gold);
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-bottom: 1px solid var(--gold);
-            padding-bottom: 5px;
-        }
-
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #ff4d4d; }
     </style>
 </head>
 <body>
 
-    <div id="player"></div>
+    <audio id="christmas-song" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2021/11/Jingle-Bells-Country.mp3" type="audio/mpeg">
+    </audio>
 
-    <div class="snow" id="snowCanvas"></div>
-
-    <div class="stage" id="main-stage">
-        <h1 class="title">A GIFT FOR YOU</h1>
-        <div class="gift-wrapper" onclick="unveilGift()">
-            <div class="gift-emoji" id="target-gift">🎁</div>
+    <div class="container">
+        <div id="game-layer">
+            <h1 id="title-text">Click the Gift! 🎁</h1>
+            <p id="sub-text">음악과 함께 선물이 나타납니다</p>
+            <div id="gift-box" onclick="startJoy()">🎁</div>
         </div>
-        <p style="margin-top: 30px; opacity: 0.7; font-weight: 100;">상자를 터치하여 음악과 선물을 확인하세요</p>
-    </div>
 
-    <div id="result-card">
-        <h2 style="font-family: 'Cinzel'; color: var(--gold);">Merry Christmas</h2>
-        <p>당신을 위해 준비한 특별한 페이지입니다.</p>
-        <div class="qr-frame">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://happyxmas.goryat.kro.kr" alt="QR">
+        <div id="result">
+            <h1>Merry Christmas! 🎄</h1>
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://happyxmas.goryat.kro.kr" alt="QR Code">
+            </div>
+            <p style="margin-top:20px; font-weight:bold;">스캔하여 확인하세요!</p>
         </div>
-        <a href="https://happyxmas.goryat.kro.kr" class="btn-link">happyxmas.goryat.kro.kr</a>
     </div>
 
     <script>
-        // 1. YouTube API 로드 및 음악 설정
-        var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // 1. 눈 내리는 배경
+        setInterval(() => {
+            const snow = document.createElement('div');
+            snow.innerHTML = '❄';
+            snow.className = 'snowflake';
+            snow.style.left = Math.random() * 100 + 'vw';
+            snow.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            snow.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            snow.style.opacity = Math.random();
+            document.body.appendChild(snow);
+            setTimeout(() => snow.remove(), 5000);
+        }, 150);
 
-        var player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '0',
-                width: '0',
-                videoId: 'E8Z-yWpgas8', // Wham! - Last Christmas
-                playerVars: { 
-                    'autoplay': 0, 
-                    'controls': 0,
-                    'start': 50 // 하이라이트 부분부터 시작
-                }
-            });
-        }
+        // 2. 메인 실행 함수
+        function startJoy() {
+            const audio = document.getElementById('christmas-song');
+            const gift = document.getElementById('gift-box');
+            const result = document.getElementById('result');
+            const gameLayer = document.getElementById('game-layer');
 
-        // 2. 선물 공개 함수
-        function unveilGift() {
-            const gift = document.getElementById('target-gift');
-            const stage = document.getElementById('main-stage');
-            const card = document.getElementById('result-card');
+            // 음악 재생 시도 (사용자 클릭 이벤트 안이므로 성공함)
+            audio.play().catch(e => console.log("Audio play failed:", e));
 
-            // 음악 재생
-            if (player && player.playVideo) {
-                player.playVideo();
-            }
-
-            // 애니메이션 실행
+            // 선물 상자 팽창 애니메이션 시작
             gift.classList.add('explode');
 
+            // 잠시 후 화면 전환
             setTimeout(() => {
-                stage.style.display = 'none';
-                card.classList.add('show');
-                document.body.style.background = "linear-gradient(to bottom, #1a0101, #4a0404)";
-            }, 700);
+                gameLayer.style.display = 'none';
+                result.classList.add('show');
+                
+                // 배경을 더 화려하게 변경
+                document.body.style.background = "radial-gradient(circle, #1a2a6c, #b21f1f, #fdbb2d)";
+            }, 650);
         }
-
-        // 3. 고급스러운 눈송이 생성
-        function createSnow() {
-            const snowContainer = document.getElementById('snowCanvas');
-            const flake = document.createElement('div');
-            const size = Math.random() * 4 + 2 + 'px';
-            
-            flake.style.position = 'absolute';
-            flake.style.top = '-10px';
-            flake.style.left = Math.random() * 100 + 'vw';
-            flake.style.width = size;
-            flake.style.height = size;
-            flake.style.background = 'white';
-            flake.style.borderRadius = '50%';
-            flake.style.filter = 'blur(1px)';
-            flake.style.opacity = Math.random();
-            flake.style.pointerEvents = 'none';
-            
-            const duration = Math.random() * 5 + 5;
-            flake.animate([
-                { transform: `translateY(0) translateX(0)` },
-                { transform: `translateY(105vh) translateX(${Math.random() * 50 - 25}px)` }
-            ], {
-                duration: duration * 1000,
-                easing: 'linear'
-            });
-
-            snowContainer.appendChild(flake);
-            setTimeout(() => flake.remove(), duration * 1000);
-        }
-        setInterval(createSnow, 150);
     </script>
 </body>
 </html>
