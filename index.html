@@ -18,137 +18,124 @@
             overflow: hidden;
         }
 
-        /* 배경 눈 내리는 효과 */
+        /* 눈 내리는 효과 */
         .snowflake {
             position: absolute;
             top: -10px;
             color: white;
-            font-size: 1.5rem;
+            pointer-events: none;
             animation: fall linear infinite;
         }
         @keyframes fall {
             to { transform: translateY(105vh); }
         }
 
-        /* 메인 컨테이너 */
-        .container {
-            text-align: center;
-            z-index: 10;
-        }
+        .container { text-align: center; z-index: 10; }
 
-        /* 선물 상자 애니메이션 */
+        /* 선물 상자 스타일 및 애니메이션 */
         #gift-box {
-            font-size: 80px;
+            font-size: 100px;
             cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.2s;
             display: inline-block;
-            margin: 20px;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
         }
 
-        #gift-box:hover {
-            transform: scale(1.2) rotate(5deg);
-        }
+        #gift-box:hover { transform: scale(1.1); }
 
         /* 팽창하며 터지는 효과 */
         .explode {
-            animation: explodeAnim 0.6s forwards;
+            animation: explodeAnim 0.7s ease-out forwards;
         }
 
         @keyframes explodeAnim {
-            0% { transform: scale(1); }
-            50% { transform: scale(2); opacity: 0.8; }
-            100% { transform: scale(0); opacity: 0; display: none; }
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(3); filter: brightness(2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
         }
 
-        /* QR 코드 및 결과 화면 */
+        /* 결과 화면 (처음엔 숨김) */
         #result {
             display: none;
             opacity: 0;
-            transition: opacity 1s;
+            transform: scale(0.5);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .qr-container {
+        #result.show {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .qr-box {
             background: white;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 20px;
             display: inline-block;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
         }
 
-        .message {
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff4d4d;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            background: #e63946;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
-        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: #ff4d4d; }
     </style>
 </head>
 <body>
 
-    <iframe id="bgm" width="0" height="0" src="https://www.youtube.com/embed/E8Z-yWpgas8?enablejsapi=1" frameborder="0" allow="autoplay"></iframe>
+    <audio id="christmas-song" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2021/11/Jingle-Bells-Country.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="container">
-        <div id="start-screen">
-            <h1>Last Christmas 🎶</h1>
-            <p>선물 상자를 클릭해서 열어보세요!</p>
-            <div id="gift-box" onclick="openGift()">🎁</div>
+        <div id="game-layer">
+            <h1 id="title-text">Click the Gift! 🎁</h1>
+            <p id="sub-text">음악과 함께 선물이 나타납니다</p>
+            <div id="gift-box" onclick="startJoy()">🎁</div>
         </div>
 
         <div id="result">
-            <div class="message">🎄 메리 크리스마스! 🎄</div>
-            <div class="qr-container">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://happyxmas.goryat.kro.kr" alt="Christmas QR">
+            <h1>Merry Christmas! 🎄</h1>
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://happyxmas.goryat.kro.kr" alt="QR Code">
             </div>
-            <p style="color: #ccc; margin-top: 15px;">QR 코드를 스캔하세요</p>
+            <p style="margin-top:20px; font-weight:bold;">스캔하여 확인하세요!</p>
         </div>
     </div>
 
     <script>
-        // 1. 눈 내리는 기능
-        function createSnow() {
+        // 1. 눈 내리는 배경
+        setInterval(() => {
             const snow = document.createElement('div');
             snow.innerHTML = '❄';
-            snow.classList.add('snowflake');
+            snow.className = 'snowflake';
             snow.style.left = Math.random() * 100 + 'vw';
-            snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+            snow.style.fontSize = (Math.random() * 10 + 10) + 'px';
+            snow.style.animationDuration = (Math.random() * 3 + 2) + 's';
             snow.style.opacity = Math.random();
-            snow.style.fontSize = Math.random() * 10 + 10 + 'px';
             document.body.appendChild(snow);
             setTimeout(() => snow.remove(), 5000);
-        }
-        setInterval(createSnow, 100);
+        }, 150);
 
-        // 2. 선물 상자 열기 기능
-        function openGift() {
+        // 2. 메인 실행 함수
+        function startJoy() {
+            const audio = document.getElementById('christmas-song');
             const gift = document.getElementById('gift-box');
             const result = document.getElementById('result');
-            const startScreen = document.getElementById('start-screen');
-            const iframe = document.getElementById('bgm');
+            const gameLayer = document.getElementById('game-layer');
 
-            // 유튜브 음악 재생 (첫 클릭 이벤트 활용)
-            iframe.src += "&autoplay=1";
+            // 음악 재생 시도 (사용자 클릭 이벤트 안이므로 성공함)
+            audio.play().catch(e => console.log("Audio play failed:", e));
 
-            // 팽창하며 터지는 애니메이션 적용
+            // 선물 상자 팽창 애니메이션 시작
             gift.classList.add('explode');
 
+            // 잠시 후 화면 전환
             setTimeout(() => {
-                startScreen.style.display = 'none';
-                result.style.display = 'block';
-                setTimeout(() => {
-                    result.style.opacity = '1';
-                }, 50);
-            }, 600);
+                gameLayer.style.display = 'none';
+                result.classList.add('show');
+                
+                // 배경을 더 화려하게 변경
+                document.body.style.background = "radial-gradient(circle, #1a2a6c, #b21f1f, #fdbb2d)";
+            }, 650);
         }
     </script>
 </body>
