@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merry Christmas! 🎁</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0a0f1d;
+            color: white;
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 배경 눈 내리는 효과 */
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1.5rem;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* 선물 상자 애니메이션 */
+        #gift-box {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            margin: 20px;
+        }
+
+        #gift-box:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        /* 팽창하며 터지는 효과 */
+        .explode {
+            animation: explodeAnim 0.6s forwards;
+        }
+
+        @keyframes explodeAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(2); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; display: none; }
+        }
+
+        /* QR 코드 및 결과 화면 */
+        #result {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff4d4d;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <iframe id="bgm" width="0" height="0" src="https://www.youtube.com/embed/E8Z-yWpgas8?enablejsapi=1" frameborder="0" allow="autoplay"></iframe>
+
+    <div class="container">
+        <div id="start-screen">
+            <h1>Last Christmas 🎶</h1>
+            <p>선물 상자를 클릭해서 열어보세요!</p>
+            <div id="gift-box" onclick="openGift()">🎁</div>
+        </div>
+
+        <div id="result">
+            <div class="message">🎄 메리 크리스마스! 🎄</div>
+            <div class="qr-container">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://happyxmas.goryat.kro.kr" alt="Christmas QR">
+            </div>
+            <p style="color: #ccc; margin-top: 15px;">QR 코드를 스캔하세요</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. 눈 내리는 기능
+        function createSnow() {
+            const snow = document.createElement('div');
+            snow.innerHTML = '❄';
+            snow.classList.add('snowflake');
+            snow.style.left = Math.random() * 100 + 'vw';
+            snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+            snow.style.opacity = Math.random();
+            snow.style.fontSize = Math.random() * 10 + 10 + 'px';
+            document.body.appendChild(snow);
+            setTimeout(() => snow.remove(), 5000);
+        }
+        setInterval(createSnow, 100);
+
+        // 2. 선물 상자 열기 기능
+        function openGift() {
+            const gift = document.getElementById('gift-box');
+            const result = document.getElementById('result');
+            const startScreen = document.getElementById('start-screen');
+            const iframe = document.getElementById('bgm');
+
+            // 유튜브 음악 재생 (첫 클릭 이벤트 활용)
+            iframe.src += "&autoplay=1";
+
+            // 팽창하며 터지는 애니메이션 적용
+            gift.classList.add('explode');
+
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                result.style.display = 'block';
+                setTimeout(() => {
+                    result.style.opacity = '1';
+                }, 50);
+            }, 600);
+        }
+    </script>
+</body>
+</html>
